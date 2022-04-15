@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:poke/utils/colors.dart';
+import 'package:poke/utils/strings.dart';
+import 'package:poke/utils/styles.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,84 +13,102 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    return const MaterialApp(
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  late TabController _tabController;
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+
+  }
+  
+  @override
   Widget build(BuildContext context) {
-    var deviceScreenWidth = MediaQuery.of(context).size.width;
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
-        ),
-        body: Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
-          child: Padding(
-            padding: EdgeInsets.all(deviceScreenWidth * 0.05),
+    var deviceScreenSize = MediaQuery.of(context).size;
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.white,
+          body: Padding(
+            padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[buildAutocomplete()],
-            ),
+              children:[
+                _screenTitle(),
+                buildAutocomplete(),
+                _buildTabs(deviceScreenSize),
+              ]),
           ),
-        ));
+      )
+    );
+         
   }
+
+   _buildTabs(Size size) =>
+     Padding(
+      padding: const EdgeInsets.only(top: 32.0),
+      child: Column(
+        children: [
+          Container(
+            decoration: PokeStyles.tabsBoxDecoration,
+            child: _pokeTabBar(),
+          ),
+          Container(
+            constraints: BoxConstraints(minWidth: 400),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                Container(
+                  decoration: PokeStyles.tabsPagesBoxDecoration,
+                  child: Center(
+                    child: Text("It's cloudy here"),
+                  ),
+                ),
+                Center(
+                  child: Text("It's rainy here"),
+                ),
+                Center(
+                  child: Text("It's sunny here"),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+
+  ///Returns tabs 
+    _pokeTabBar() =>
+      TabBar(
+            controller: _tabController,
+            labelColor: AppColors.black,
+            unselectedLabelColor: Colors.black,
+            indicator: PokeStyles.indicatorBoxStyle,
+            tabs: const <Widget> [
+              Tab(text: Strings.all),
+              Tab(text: Strings.fire),
+              Tab(text: Strings.grass),
+            ],
+          );
+   
+  
+
+  ///Returns screen title widget 
+   _screenTitle() => Center(child: Text(Strings.pokeScreenTitle, style: PokeStyles.screenTitleTextStyle));
 
   Autocomplete<User> buildAutocomplete() {
 
