@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:poke/providers/pokemon_provider.dart';
+import 'package:provider/provider.dart';
 import '../utils/colors.dart';
 import '../utils/strings.dart';
 import '../utils/styles.dart';
@@ -19,60 +21,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    // Provider.of<PokeProvider>(context, listen: false).getHomeData();
+    Provider.of<PokemonProvider>(context, listen: false).getNames();
   }
-
-  Future<void> _refreshData(BuildContext context) async {
-    // await Provider.of<PokeProvider>(context, listen: false).getHomeData();
-  }
-
-/*  @override
-  Widget build(BuildContext context) {
-    // final data = Provider.of<PokeProvider>(context);
-    // final pokeData = data.pokeList;
-    var deviceScreenSize = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
-          child: Column(
-            children: [
-              // _screenTitle(),
-              _searchBar(deviceScreenSize),
-              _buildTabs(deviceScreenSize)
-
-
-
-              // Expanded(
-              //   child: data.isLoading
-              //       ? Center(child: Image.asset('images/pokeLoad.gif'))
-              //       : RefreshIndicator(
-              //     onRefresh: () => _refreshData(context),
-              //     child: ListView(
-              //       padding: EdgeInsets.only(top: 20),
-              //       children: [
-              //         Column(
-              //           children: pokeData
-              //               .map((item) =>
-              //                   PokeCard(item, context))
-              //               .toList(),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-
-
-
-
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  */
-
+  
   @override
   Widget build(BuildContext context) {
     var deviceScreenSize = MediaQuery.of(context).size;
@@ -94,9 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   }
 
-  _searchBar(Size deviceScreenSize) =>
-     const HomeSearch();
-
+  _searchBar(Size deviceScreenSize) => const HomeSearch();
 
   _buildTabs(Size size) =>
       Padding(
@@ -107,21 +56,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               decoration: PokeStyles.tabsBoxDecoration,
               child: _pokeTabBar(),
             ),
-            Container(
+            SizedBox(
               height: 250,
               child: TabBarView(
                 controller: _tabController,
                 children: [
                   Container(
                     decoration: PokeStyles.tabsPagesBoxDecoration,
-                    child: Center(
+                    child: const Center(
                       child: Text("It's cloudy here"),
                     ),
                   ),
-                  Center(
+                  const Center(
                     child: Text("It's rainy here"),
                   ),
-                  Center(
+                  const Center(
                     child: Text("It's sunny here"),
                   ),
                 ],

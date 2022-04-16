@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/pokemon.dart';
-import '../utils/strings.dart';
-import '../utils/styles.dart';
+import '../providers/pokemon_provider.dart';
+import '../screens/details_screen.dart';
 
 class SearchBar extends StatefulWidget {
   const SearchBar({Key? key}) : super(key: key);
@@ -14,9 +14,14 @@ class SearchBar extends StatefulWidget {
 class _SearchBarState extends State<SearchBar> {
   final _textController = TextEditingController();
   final bool _validate = false;
+  late List<String> pokemonNames;
 
   @override
   Widget build(BuildContext context) {
+
+    final provider = Provider.of<PokemonProvider>(context);
+    pokemonNames = provider.pokemonNames;
+
     return Container(
       margin: const EdgeInsets.only(top: 25),
       decoration: BoxDecoration(
@@ -28,23 +33,23 @@ class _SearchBarState extends State<SearchBar> {
   }
 
   buildAutocomplete() {
-    return Autocomplete<Pokemon>(
-      displayStringForOption: _displayStringForOption,
+    return Autocomplete<String>(
       optionsBuilder: (TextEditingValue textEditingValue) => _autoCompleteAction(textEditingValue),
-      onSelected: (Pokemon selection) {
-        debugPrint(
-            'You just selected ${_displayStringForOption(selection)}');
+      onSelected: (String selection) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailsScreen(name: selection)),
+        );
       },
     );
   }
 
-  Iterable<Pokemon> _autoCompleteAction(TextEditingValue textEditingValue) {
+  Iterable<String> _autoCompleteAction(TextEditingValue textEditingValue) {
       if (textEditingValue.text == '') {
-        return const Iterable<Pokemon>.empty();
+        return const Iterable<String>.empty();
       }
-      return _pokemonOptions.where((Pokemon option) {
+      return pokemonNames.where((String option) {
         return option
-            .name
             .contains(textEditingValue.text.toLowerCase());
       });
   }
@@ -77,16 +82,6 @@ class _SearchBarState extends State<SearchBar> {
           },
         );
   }
-
-  static String _displayStringForOption(Pokemon option) => option.name;
-
-  static const List<Pokemon> _pokemonOptions = <Pokemon>[
-    Pokemon(id: 1, name: "Alice"),
-    Pokemon(id: 2, name: "Bob"),
-    Pokemon(id: 3, name: "pokemon")
-    // Pokemon(name: 'Bob', email: 'bob@example.com'),
-    // Pokemon(name: 'Charlie', email: 'charlie123@gmail.com'),
-  ];
 
   @override
   void dispose() {
