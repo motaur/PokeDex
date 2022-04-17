@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:poke/models/gallery_name.dart';
 
 class Pokemon extends ChangeNotifier {
 
-  String? nickName;
+  GalleryName? galleryName;
   String? givenName;
 
   final String id;
@@ -24,22 +25,22 @@ class Pokemon extends ChangeNotifier {
 
 class GalleryPokemon {
   final String id;
-  final String? name;
-  final String? nickName;
+  final String name;
+  final GalleryName galleryName;
 
   GalleryPokemon({
     required this.id,
     required this.name,
-    required this.nickName});
+    required this.galleryName});
 
   GalleryPokemon.fromJson(Map<String, dynamic> json) :
         name = json['name'],
-        nickName = json['nickName'],
+        galleryName = json['nickName'],
         id = json['id'];
 
   Map<String, dynamic> toJson() => {
     'name': name,
     'id': id,
-    'nickName': nickName,
+    'nickName': galleryName,
   };
 }

@@ -1,0 +1,4 @@
+enum GalleryName {
+  name,
+  nickname
+}

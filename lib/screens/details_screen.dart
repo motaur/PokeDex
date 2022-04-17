@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke/models/gallery_name.dart';
 import 'package:provider/provider.dart';
 
 import '../models/pokemon.dart';
@@ -16,12 +17,11 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailsScreen> {
+
   final String name;
-
   final _formKey = GlobalKey<FormState>();
-
-  var nameController = TextEditingController();
-  var nickNameController = TextEditingController();
+  var _galleryNameController = TextEditingController();
+  GalleryName? _galleryName;
 
   _DetailScreenState(this.name);
 
@@ -32,14 +32,13 @@ class _DetailScreenState extends State<DetailsScreen> {
     return FutureBuilder<Pokemon>(
         future: provider.getDetails(name),
         builder: (context, AsyncSnapshot<Pokemon> snapshot) {
-          if(snapshot.hasData) {
+          if (snapshot.hasData) {
             return _buildDetails(snapshot.requireData);
-          } else if(snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return const SafeArea(
               child: Center(child: Text('Error')),
             );
-          }
-          else {
+          } else {
             return const SafeArea(
               child: Center(child: CircularProgressIndicator()),
             );
@@ -51,16 +50,14 @@ class _DetailScreenState extends State<DetailsScreen> {
     return Scaffold(
         body: Column(
       children: [
-        Center(child:
-          Text(details.name, style: Styles.screenTitleTextStyle)),
+        Center(child: Text(details.name, style: Styles.screenTitleTextStyle)),
         Container(height: MediaQuery.of(context).size.width * 0.4),
         Stack(
           clipBehavior: Clip.none,
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width * 0.2
-            ),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.width * 0.2),
             Positioned(
               right: 35,
               bottom: -50,
@@ -80,19 +77,14 @@ class _DetailScreenState extends State<DetailsScreen> {
               decoration: const BoxDecoration(
                 color: Colors.white,
               ),
-              child: Column(
-
-              )),
+              child: Column()),
         ),
         _buildSaveForm(details.id)
       ],
     ));
   }
 
-  _buildSaveForm(String id){
-
-
-
+  _buildSaveForm(String id) {
     return Form(
       key: _formKey,
       child: SafeArea(
@@ -100,37 +92,44 @@ class _DetailScreenState extends State<DetailsScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: GalleryName.name,
+                      onChanged: (newValue) => setState(() {
+                        _galleryName = newValue as GalleryName;
+                      }),
+                      groupValue: _galleryName,
+                    ),
+                    const Text('Name'),
+                    Radio(
+                      value: GalleryName.nickname,
+                      groupValue: _galleryName,
+                      onChanged: (newValue) => setState(() {
+                        _galleryName = newValue as GalleryName;
+                      })
+                    ),
+                    const Text('Nick'),
+                  ]),
+
               TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                    labelText: 'Name'
-                ),
+                controller: _galleryNameController,
+                decoration: const InputDecoration(labelText: 'Nickname'),
                 // The validator receives the text that the user has entered.
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
+                    return 'The field should content at least 1 character';
                   }
                   return null;
                 },
               ),
-              TextFormField(
-                controller: nickNameController,
-                decoration: const InputDecoration(
-                    labelText: 'Nickname'
-                ),
-                // The validator receives the text that the user has entered.
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
+
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
+                  if (_galleryName != null && _formKey.currentState!.validate()) {
                     Provider.of<PokemonProvider>(context, listen: false)
-                        .saveToGallery(id, nameController.value.text, nickNameController.value.text)
+                        .saveToGallery(id, _galleryNameController.value.text, _galleryName!)
                         .then((value) => Navigator.pop(context));
                   }
                 },
@@ -142,5 +141,4 @@ class _DetailScreenState extends State<DetailsScreen> {
       ),
     );
   }
-
 }

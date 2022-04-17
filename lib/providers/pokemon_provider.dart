@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:poke/db/entities/gallery_entity.dart';
+import 'package:poke/models/gallery_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../db/database.dart';
@@ -57,7 +58,7 @@ class PokemonProvider with ChangeNotifier {
         json.decode(
             prefs.getString(p.id)!) as Map<String, dynamic>);
 
-    p.nickName = gallery.nickName;
+    p.galleryName = gallery.galleryName;
     p.givenName = gallery.name;
 
     return p;
@@ -82,17 +83,9 @@ class PokemonProvider with ChangeNotifier {
     }
   }
 
-  Future<void> saveToGallery(String id, String name, String nickName) async {
-    // return _db.galleryDao.insertData(GalleryEntity(id: id, name: name, nickName: nickName));
+  Future<void> saveToGallery(String id, String name, GalleryName galleryName) async {
 
-    String json = jsonEncode(GalleryPokemon(name: name, id: id, nickName: nickName));
+    String json = jsonEncode(GalleryPokemon(name: name, id: id, galleryName: galleryName));
     prefs.setString(id, json);
-  }
-
-  Future<void> getHomeData() async {
-    Future.wait([
-       getSavedPokemons(),
-       getNames()
-    ]);
   }
 }

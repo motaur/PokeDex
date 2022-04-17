@@ -91,10 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Container(
                   decoration: Styles.tabsPagesBoxDecoration,
                   child: GridView.count(
-                    // Create a grid with 2 columns. If you change the scrollDirection to
-                    // horizontal, this produces 2 rows.
                       crossAxisCount: 2,
-                      // Generate 100 widgets that display their index in the List.
                       children: List.generate(Provider
                           .of<PokemonProvider>(context, listen: false)
                           .gallery
@@ -120,7 +117,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         elevation: 5,
         child: Column(
           children: [
-            Text(gallery[i].name)
+            Text(gallery[i].name),
+
           ],
         )
     );
