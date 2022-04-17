@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:poke/utils/colors.dart';
 
-class PokeStyles {
+class Styles {
 
   static TextStyle get screenTitleTextStyle =>
       const TextStyle(fontSize: 24, fontWeight: FontWeight.w800);

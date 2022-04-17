@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poke/providers/pokemon_provider.dart';
 import 'package:provider/provider.dart';
+import '../models/pokemon.dart';
 import '../utils/colors.dart';
 import '../utils/strings.dart';
 import '../utils/styles.dart';
@@ -20,82 +21,123 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     Provider.of<PokemonProvider>(context, listen: false).getNames();
   }
   
   @override
   Widget build(BuildContext context) {
-    var deviceScreenSize = MediaQuery.of(context).size;
-    return SafeArea(
-        child: Scaffold(
-          backgroundColor: AppColors.white,
-          body: Padding(
-            padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children:[
-                  _screenTitle(),
-                  _searchBar(deviceScreenSize),
-                  _buildTabs(deviceScreenSize),
-                ]),
-          ),
-        )
-    );
+    return _buildHomeScreen();
+  }
+  Widget _buildHomeScreen() {
+      var deviceScreenSize = MediaQuery.of(context).size;
+      return SafeArea(
+          child: Scaffold(
+            backgroundColor: AppColors.white,
+            body: Padding(
+              padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:[
+                    _screenTitle(),
+                    _searchBar(deviceScreenSize),
+                    _loadGallery(deviceScreenSize),
+                  ]),
+            ),
+          )
+      );
+    }
 
+  Widget _searchBar(Size deviceScreenSize) => const HomeSearch();
+
+  Widget _loadGallery(Size size) {
+    return FutureBuilder<List<Pokemon>>(
+        future: Provider.of<PokemonProvider>(context, listen: false).getSavedPokemons(),
+        builder: (context, AsyncSnapshot<List<Pokemon>> snapshot) {
+          if (snapshot.hasData && Provider.of<PokemonProvider>(context, listen: false).gallery.isNotEmpty) {
+            return _buildTabs(snapshot.data!);
+          }
+          else if (snapshot.hasData && Provider.of<PokemonProvider>(context, listen: false).gallery.isEmpty) {
+            return const SafeArea(
+                child:Center(child: Text("Nothing saved")));
+          }
+          else if (snapshot.hasError) {
+            return const SafeArea(
+              child: Center(child: Text('Error')),
+            );
+          }
+          else {
+            return const SafeArea(
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+        });
   }
 
-  _searchBar(Size deviceScreenSize) => const HomeSearch();
+  Widget _buildTabs(List<Pokemon> data) {
+    _tabController = TabController(length: 3, vsync: this);
+    return Padding(
+      padding: const EdgeInsets.only(top: 32.0),
+      child: Column(
+        children: [
+          Container(
+            decoration: Styles.tabsBoxDecoration,
+            child: _pokeTabBar(),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                Container(
+                  decoration: Styles.tabsPagesBoxDecoration,
+                  child: GridView.count(
+                    // Create a grid with 2 columns. If you change the scrollDirection to
+                    // horizontal, this produces 2 rows.
+                      crossAxisCount: 2,
+                      // Generate 100 widgets that display their index in the List.
+                      children: List.generate(Provider
+                          .of<PokemonProvider>(context, listen: false)
+                          .gallery
+                          .length, (index) => _buildCard(index))),
+                ),
+                const Center(
+                  child: Text("It's rainy here"),
+                ),
+                const Center(
+                  child: Text("It's sunny here"),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
 
-  _buildTabs(Size size) =>
-      Padding(
-        padding: const EdgeInsets.only(top: 32.0),
+  Widget _buildCard(int i){
+    var gallery = Provider.of<PokemonProvider>(context, listen: false).gallery;
+    return Card(
+        elevation: 5,
         child: Column(
           children: [
-            Container(
-              decoration: PokeStyles.tabsBoxDecoration,
-              child: _pokeTabBar(),
-            ),
-            SizedBox(
-              height: 250,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  Container(
-                    decoration: PokeStyles.tabsPagesBoxDecoration,
-                    child: const Center(
-                      child: Text("It's cloudy here"),
-                    ),
-                  ),
-                  const Center(
-                    child: Text("It's rainy here"),
-                  ),
-                  const Center(
-                    child: Text("It's sunny here"),
-                  ),
-                ],
-              ),
-            )
+            Text(gallery[i].name)
           ],
-        ),
-      );
+        )
+    );
+  }
+  Widget _pokeTabBar() =>
+        TabBar(
+          controller: _tabController,
+          labelColor: AppColors.black,
+          unselectedLabelColor: Colors.black,
+          indicator: Styles.indicatorBoxStyle,
+          tabs: const <Widget> [
+            Tab(text: Strings.all),
+            Tab(text: Strings.fire),
+            Tab(text: Strings.grass),
+          ],
+        );
 
-  ///Returns tabs
-  _pokeTabBar() =>
-      TabBar(
-        controller: _tabController,
-        labelColor: AppColors.black,
-        unselectedLabelColor: Colors.black,
-        indicator: PokeStyles.indicatorBoxStyle,
-        tabs: const <Widget> [
-          Tab(text: Strings.all),
-          Tab(text: Strings.fire),
-          Tab(text: Strings.grass),
-        ],
-      );
-
-
-
-  ///Returns screen title widget
-  _screenTitle() => Center(child: Text(Strings.pokeScreenTitle, style: PokeStyles.screenTitleTextStyle));
+  _screenTitle() => Center(child: Text(Strings.pokeScreenTitle, style: Styles.screenTitleTextStyle));
 }
+
