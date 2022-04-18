@@ -13,44 +13,65 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   final _textController = TextEditingController();
-  late List<String> pokemonNames;
+  late PokemonProvider provider;
+
+  @override
+  void initState() {
+    super.initState();
+    provider = Provider.of<PokemonProvider>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    final provider = Provider.of<PokemonProvider>(context);
-    pokemonNames = provider.pokemonNames;
-
-    return Container(
-      margin: const EdgeInsets.only(top: 25),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: buildAutocomplete()
+    return FutureBuilder<List<String>>(
+        future: provider.getNames(),
+        builder: (context, AsyncSnapshot<List<String>> snapshot) {
+          if (snapshot.hasData) {
+            return _buildSearch(snapshot.data!);
+          } else if (snapshot.hasError) {
+            return const SafeArea(
+              child: Center(child: Text('Error')),
+            );
+          } else {
+            return const SafeArea(
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+        }
     );
   }
 
-  buildAutocomplete() {
+  _buildSearch(List<String> pokemonNames) {
+    return Container(
+        margin: const EdgeInsets.only(top: 25),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: buildAutocomplete(pokemonNames));
+  }
+
+  buildAutocomplete(List<String> pokemonNames) {
     return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue textEditingValue) => _autoCompleteAction(textEditingValue),
+      optionsBuilder: (TextEditingValue textEditingValue) =>
+          _autoCompleteAction(textEditingValue, pokemonNames),
       onSelected: (String selection) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DetailsScreen(name: selection)),
+          MaterialPageRoute(
+              builder: (context) => DetailsScreen(name: selection)),
         );
       },
     );
   }
 
-  Iterable<String> _autoCompleteAction(TextEditingValue textEditingValue) {
-      if (textEditingValue.text == '') {
-        return const Iterable<String>.empty();
-      }
-      return pokemonNames.where((String option) {
-        return option
-            .contains(textEditingValue.text.toLowerCase());
-      });
+  Iterable<String> _autoCompleteAction(TextEditingValue textEditingValue, List<String> pokemonNames) {
+    if (textEditingValue.text == '') {
+      return const Iterable<String>.empty();
+    }
+    return pokemonNames.where((String option) {
+      return option.contains(textEditingValue.text.toLowerCase());
+    });
   }
 
   @override

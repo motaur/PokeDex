@@ -8,7 +8,7 @@ import '../models/pokemon.dart';
 import '../utils/colors.dart';
 import '../utils/strings.dart';
 import '../utils/styles.dart';
-import '../widgets/home_search.dart';
+import '../widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,11 +20,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   late TabController _tabController;
+  late PokemonProvider provider;
 
   @override
   void initState() {
     super.initState();
-    Provider.of<PokemonProvider>(context, listen: false).getNames();
+    provider = Provider.of<PokemonProvider>(context, listen: false);
   }
   
   @override
@@ -51,11 +52,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     }
 
-  Widget _searchBar(Size deviceScreenSize) => const HomeSearch();
+  Widget _searchBar(Size deviceScreenSize) => const SearchBar();
 
   Widget _loadGallery(Size size) {
     return FutureBuilder<Map<String, List<Pokemon>>>(
-        future: Provider.of<PokemonProvider>(context, listen: false).getSavedPokemons(),
+        future: provider.getSavedPokemons(),
         builder: (context, AsyncSnapshot<Map<String, List<Pokemon>>> snapshot) {
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             return _buildTabs(snapshot.data!);

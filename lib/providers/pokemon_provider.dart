@@ -2,11 +2,8 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:poke/db/entities/gallery_entity.dart';
 import 'package:poke/models/gallery_name.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../db/database.dart';
 import '../main.dart';
 import '../models/pokemon.dart';
 import 'package:http/http.dart' as http;
@@ -15,15 +12,12 @@ class PokemonProvider with ChangeNotifier {
 
   final _baseUrl = "https://pokeapi.co/api/v2/pokemon";
 
-  List<String> pokemonNames = [];
-  late Pokemon details;
-
   Future<List<String>> getNames() async {
     try {
       Uri url = Uri.parse("$_baseUrl/?offset=0&limit=999999");
       final response = await http.get(url);
       final responseData = json.decode(response.body) as Map<String, dynamic>;
-      pokemonNames = [];
+      List<String> pokemonNames = [];
       for (var element in (responseData['results'] as List)) {
         element as Map<String, dynamic>;
         var name = element['name'] as String;
@@ -32,6 +26,7 @@ class PokemonProvider with ChangeNotifier {
       notifyListeners();
       return pokemonNames;
     } catch (e) {
+      logger.e(e);
       rethrow;
     }
   }
@@ -66,7 +61,6 @@ class PokemonProvider with ChangeNotifier {
         return value;
       });
     }
-
     return pokemonByType;
   }
 
@@ -85,7 +79,7 @@ class PokemonProvider with ChangeNotifier {
     try {
       final response = await http.get(Uri.parse("$_baseUrl/$name"));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
-      details = Pokemon(
+      var details = Pokemon(
           id: responseData['id'].toString(),
           name: responseData['name'],
           sprite: responseData['sprites']['front_default'],
