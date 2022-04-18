@@ -19,7 +19,6 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailsScreen> {
-  late PokemonProvider _provider;
   final String name;
   final _formKey = GlobalKey<FormState>();
   final _galleryNameController = TextEditingController();
@@ -30,33 +29,37 @@ class _DetailScreenState extends State<DetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _provider = Provider.of<PokemonProvider>(context, listen: false);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FutureBuilder<Pokemon>(
-              future: _provider.getDetails(name),
-              builder: (context, AsyncSnapshot<Pokemon> snapshot) {
-                if (snapshot.hasData) {
-                  return _buildDetails(snapshot.requireData);
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text(Strings.failed));
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              }),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => 
+      Consumer<PokemonProvider>(builder: _detailsScreenEntryPoint);
+  
 
-  _buildDetails(Pokemon details) {
+  ///[DetailsScreen] main content
+   Widget _detailsScreenEntryPoint(BuildContext context,PokemonProvider pokemonProvider, Widget? ignored) =>
+     SafeArea(
+    child: Scaffold(
+      backgroundColor: AppColors.background,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: FutureBuilder<Pokemon>(
+            future: pokemonProvider.getDetails(name),
+            builder: (context, AsyncSnapshot<Pokemon> snapshot) {
+              if (snapshot.hasData) {
+                return _buildDetails(snapshot.requireData, pokemonProvider);
+              } else if (snapshot.hasError) {
+                return const Center(child: Text(Strings.failed));
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            }),
+      ),
+    ),
+  );
+  
+
+  _buildDetails(Pokemon details, PokemonProvider pokemonProvider) {
     return Scaffold(
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -90,12 +93,12 @@ class _DetailScreenState extends State<DetailsScreen> {
               ),
               child: Column()),
         ),
-        _buildSaveForm(details)
+        _buildSaveForm(details,pokemonProvider)
       ],
     ));
   }
 
-  _buildSaveForm(Pokemon details) {
+  _buildSaveForm(Pokemon details, PokemonProvider pokemonProvider) {
     if (details.galleryNameType != null) {
       _galleryNameType = details.galleryNameType;
       _galleryNameController.text = details.galleryName!;
@@ -145,13 +148,13 @@ class _DetailScreenState extends State<DetailsScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (details.galleryNameType != null) {
-                      _provider
+                      pokemonProvider
                           .deleteFromGallery(details.id)
                           .then((value) => Navigator.pop(context));
                     } else if ((_galleryNameType != null &&
                             _formKey.currentState!.validate()) &&
                         _galleryNameType != null) {
-                      _provider
+                      pokemonProvider
                           .saveToGallery(
                               details.id,
                               _galleryNameController.value.text,

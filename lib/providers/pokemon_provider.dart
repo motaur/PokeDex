@@ -2,11 +2,11 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:poke/models/gallery_name.dart';
 
 import '../main.dart';
 import '../models/pokemon.dart';
-import 'package:http/http.dart' as http;
 
 class PokemonProvider with ChangeNotifier {
 
@@ -102,9 +102,11 @@ class PokemonProvider with ChangeNotifier {
     String json = jsonEncode(
         GalleryPokemon(name: name, id: id, galleryName: galleryName));
     await prefs.setString(id, json);
+    notifyListeners();
   }
 
   Future<void> deleteFromGallery(String id) async {
     await prefs.remove(id);
+    notifyListeners();
   }
 }
