@@ -15,5 +15,7 @@ class Styles {
       color: AppColors.gray100,
       borderRadius: BorderRadius.all(Radius.circular(8)));
 
-  static BoxDecoration get indicatorBoxStyle =>  const BoxDecoration(color: AppColors.gray100, borderRadius: BorderRadius.all(Radius.circular(8)));
+  static BoxDecoration get indicatorBoxStyle =>  const BoxDecoration(
+      color: AppColors.gray400,
+      borderRadius: BorderRadius.all(Radius.circular(8)));
 }

@@ -7,6 +7,7 @@ import '../models/pokemon.dart';
 import '../utils/colors.dart';
 import '../utils/strings.dart';
 import '../utils/styles.dart';
+import '../utils/utils.dart';
 import '../widgets/search_bar.dart';
 import 'details_screen.dart';
 
@@ -28,14 +29,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) =>
      Consumer<PokemonProvider>(builder: _buildHomeScreen);
-  
 
   Widget _buildHomeScreen(BuildContext context, PokemonProvider pokemonProvider, Widget? ignored) {
     var deviceScreenSize = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: AppColors.background,
+      // backgroundColor: AppColors.background,
       body: Padding(
         padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -143,8 +143,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   _pokemonCard(List<Pokemon> data, int i) => Container(
       decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(width: 1, color: AppColors.gray200),
+        color: Theme.of(context).cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3), // changes position of shadow
+          ),
+        ],
+          // color: Colors.white,
+          border:
+          Border.all(width: 1,
+              // color: AppColors.gray200
+          ),
           borderRadius: const BorderRadius.all(Radius.circular(8))),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -158,10 +170,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: _imageWidget(data, i),
               ),
               data[i].galleryNameType == GalleryNameType.name
-                  ? Text('Name: ${data[i].galleryName!}')
-                  : Text('Nickname: ${data[i].galleryName!}'),
-              Text(data[i].type),
-              Text(data[i].weight.toString()),
+                  ? Text('${Strings.name}: ${data[i].galleryName!}')
+                  : Text('${Strings.nickname}: ${data[i].galleryName!}'),
+              Text(Strings.type + ": ${data[i].type}"),
+              Text(Strings.weight + ": ${lbsToKg(data[i].weight).toStringAsFixed(1)}"),
             ],
           ),
         ),
@@ -179,8 +191,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildTabBar(Map<String, List<Pokemon>> data) {
     return TabBar(
       controller: _tabController,
-      labelColor: AppColors.black,
-      unselectedLabelColor: Colors.black,
+      unselectedLabelColor: Theme.of(context).tabBarTheme.unselectedLabelColor,
+      labelColor: Theme.of(context).tabBarTheme.labelColor,
+      automaticIndicatorColorAdjustment: true,
       indicator: Styles.indicatorBoxStyle,
       tabs: _buildTabsByType(data),
     );

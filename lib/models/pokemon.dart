@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:poke/models/gallery_name.dart';
+import 'package:poke/utils/utils.dart';
 
 class Pokemon extends ChangeNotifier {
 
@@ -22,9 +23,9 @@ class Pokemon extends ChangeNotifier {
 
   Pokemon.fromJson(Map<String, dynamic> json):
         id = json['id'].toString(),
-        name = json['name'],
+        name = json['name'].toString().capitalize(),
         sprite = json['sprites']['front_default'],
-        type = json['types'][0]['type']['name'],
+        type = json['types'][0]['type']['name'].toString().capitalize(),
         weight = json['weight'];
 }
 

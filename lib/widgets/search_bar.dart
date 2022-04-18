@@ -45,7 +45,7 @@ class _SearchBarState extends State<SearchBar> {
     return Container(
         margin: const EdgeInsets.only(top: 25),
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          // color: Colors.grey[200],
           borderRadius: BorderRadius.circular(10),
         ),
         child: buildAutocomplete(pokemonNames));

@@ -10,4 +10,8 @@ class Strings {
 
   static const deleteFromGallery = 'Delete from gallery';
   static const saveToGallery = 'Save to gallery';
+
+  static const weight = "Weight";
+
+  static const type = "Type";
 }

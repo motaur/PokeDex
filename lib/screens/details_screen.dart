@@ -32,70 +32,83 @@ class _DetailScreenState extends State<DetailsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => 
+  Widget build(BuildContext context) =>
       Consumer<PokemonProvider>(builder: _detailsScreenEntryPoint);
-  
+
 
   ///[DetailsScreen] main content
-   Widget _detailsScreenEntryPoint(BuildContext context,PokemonProvider pokemonProvider, Widget? ignored) =>
-     SafeArea(
-    child: Scaffold(
-      backgroundColor: AppColors.background,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FutureBuilder<Pokemon>(
-            future: pokemonProvider.getDetails(name),
-            builder: (context, AsyncSnapshot<Pokemon> snapshot) {
-              if (snapshot.hasData) {
-                return _buildDetails(snapshot.requireData, pokemonProvider);
-              } else if (snapshot.hasError) {
-                return const Center(child: Text(Strings.failed));
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            }),
-      ),
-    ),
-  );
-  
+  Widget _detailsScreenEntryPoint(BuildContext context,
+      PokemonProvider pokemonProvider, Widget? ignored) =>
+      SafeArea(
+        child: Scaffold(
+          // backgroundColor: AppColors.background,
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder<Pokemon>(
+                future: pokemonProvider.getDetails(name),
+                builder: (context, AsyncSnapshot<Pokemon> snapshot) {
+                  if (snapshot.hasData) {
+                    return _buildDetails(snapshot.requireData, pokemonProvider);
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text(Strings.failed));
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                }),
+          ),
+        ),
+      );
+
 
   _buildDetails(Pokemon details, PokemonProvider pokemonProvider) {
     return Scaffold(
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Center(child: _screenTitle(details.name.toUpperCase())),
-        Container(height: MediaQuery.of(context).size.width * 0.4),
-        Stack(
-          clipBehavior: Clip.none,
           children: [
-            SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.width * 0.2),
-            Positioned(
-              right: 35,
-              bottom: -50,
-              left: 35,
-              child: FadeInImage.assetNetwork(
-                image: details.sprite,
-                placeholderScale: 0.1,
-                placeholder: 'images/loading.gif',
-              ),
+            Center(child: _screenTitle(details.name.toUpperCase())),
+            Container(height: MediaQuery
+                .of(context)
+                .size
+                .width * 0.4),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SizedBox(
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.2),
+                Positioned(
+                  right: 35,
+                  bottom: -50,
+                  left: 35,
+                  child: FadeInImage.assetNetwork(
+                    image: details.sprite,
+                    placeholderScale: 0.2,
+                    placeholder: 'images/loading.gif',
+                  ),
+                ),
+              ],
             ),
+            Expanded(
+              child: Container(
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  padding: const EdgeInsets.only(top: 5),
+                  decoration: const BoxDecoration(
+                    // color: Colors.white,
+                  ),
+                  child: Column()),
+            ),
+            _buildSaveForm(details, pokemonProvider)
           ],
-        ),
-        Expanded(
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.only(top: 5),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: Column()),
-        ),
-        _buildSaveForm(details,pokemonProvider)
-      ],
-    ));
+        ));
   }
 
   _buildSaveForm(Pokemon details, PokemonProvider pokemonProvider) {
@@ -116,16 +129,18 @@ class _DetailScreenState extends State<DetailsScreen> {
                   children: <Widget>[
                     Radio(
                       value: GalleryNameType.name,
-                      onChanged: (newValue) => setState(() {
-                        _galleryNameType = newValue as GalleryNameType;
-                      }),
+                      onChanged: (newValue) =>
+                          setState(() {
+                            _galleryNameType = newValue as GalleryNameType;
+                          }),
                       groupValue: _galleryNameType,
                     ),
                     const Text(Strings.name),
                     Radio(
                         value: GalleryNameType.nickname,
                         groupValue: _galleryNameType,
-                        onChanged: (newValue) => setState(() {
+                        onChanged: (newValue) =>
+                            setState(() {
                               _galleryNameType = newValue as GalleryNameType;
                             })),
                     const Text(Strings.nickname),
