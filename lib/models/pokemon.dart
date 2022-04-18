@@ -9,14 +9,14 @@ class Pokemon extends ChangeNotifier {
   final String id;
   final String name;
   final String sprite;
-  final String type1;
+  final String type;
   final num weight;
 
   Pokemon({
     required this.id,
     required this.name,
     required this.sprite,
-    required this.type1,
+    required this.type,
     required this.weight
   });
 }

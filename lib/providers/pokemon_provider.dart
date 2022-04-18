@@ -32,8 +32,9 @@ class PokemonProvider with ChangeNotifier {
   }
 
   Future<Map<String, List<Pokemon>>> getSavedPokemons() async {
-    var ids = prefs.getKeys();
+    Map<String, List<Pokemon>> pokemonByType = HashMap();
 
+    var ids = prefs.getKeys();
     List<Future<Pokemon>> requests = [];
 
     for (var id in ids) {
@@ -43,8 +44,6 @@ class PokemonProvider with ChangeNotifier {
 
     List<Pokemon> merged = [];
 
-    Map<String, List<Pokemon>> pokemonByType = HashMap();
-
     for (var element in results) {
       merged.add(
           _mergeGallery(element));
@@ -52,11 +51,11 @@ class PokemonProvider with ChangeNotifier {
 
     for (var pokemon in merged) {
       List<Pokemon> list = [];
-      pokemonByType.addEntries({ pokemon.type1 : list }.entries);
+      pokemonByType.addEntries({ pokemon.type : list }.entries);
     }
 
     for (var pokemon in merged) {
-      pokemonByType.update(pokemon.type1, (List<Pokemon> value) {
+      pokemonByType.update(pokemon.type, (List<Pokemon> value) {
         value.add(pokemon);
         return value;
       });
@@ -83,7 +82,7 @@ class PokemonProvider with ChangeNotifier {
           id: responseData['id'].toString(),
           name: responseData['name'],
           sprite: responseData['sprites']['front_default'],
-          type1: responseData['types'][0]['type']['name'],
+          type: responseData['types'][0]['type']['name'],
           weight: responseData['weight']
       );
       return details;

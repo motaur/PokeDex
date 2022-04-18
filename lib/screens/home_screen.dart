@@ -157,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               data[i].galleryName == GalleryName.name ?
                 Text("Name: ${data[i].givenName!}") : Text("Nickname: ${data[i].givenName!}"),
 
-              Text(data[i].type1)
+              Text(data[i].type)
 
 
             ],
