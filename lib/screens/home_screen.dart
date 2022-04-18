@@ -40,10 +40,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
-        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const SearchBar(),
-          _loadGallery(
-              pokemonProvider: pokemonProvider, size: deviceScreenSize),
+        child: Column(mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SearchBar(),
+              _loadGallery(
+                  pokemonProvider: pokemonProvider, size: deviceScreenSize),
         ]),
       ),
     ));
@@ -58,10 +59,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             return _buildTabs(snapshot.data!);
           } else if (snapshot.hasData && snapshot.data!.isEmpty) {
             return const SafeArea(
-                child: Center(child: Text("Nothing saved in Gallery")));
+                child: Center(child: Padding(
+                  padding: EdgeInsets.all(50.0),
+                  child: Text(Strings.galleryEmpty),
+                )));
           } else if (snapshot.hasError) {
             return const SafeArea(
-              child: Center(child: Text('Error')),
+              child: Center(child: Text(Strings.failed)),
             );
           } else {
             return const SafeArea(

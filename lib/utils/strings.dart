@@ -24,4 +24,6 @@ class Strings {
   static const searchForPokemon = "Search for a Pokemon";
 
   static const foundNothing = "Found Nothing, try another name";
+
+  static const galleryEmpty = "Your gallery is empty";
 }
