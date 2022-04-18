@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/pokemon_provider.dart';
 import '../screens/details_screen.dart';
+import '../utils/strings.dart';
 
 class SearchBar extends StatefulWidget {
   const SearchBar({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _SearchBarState extends State<SearchBar> {
             return _buildSearch(snapshot.data!);
           } else if (snapshot.hasError) {
             return const SafeArea(
-              child: Center(child: Text('Error')),
+              child: Center(child: Text(Strings.failed)),
             );
           } else {
             return const SafeArea(
@@ -53,9 +55,38 @@ class _SearchBarState extends State<SearchBar> {
 
   buildAutocomplete(List<String> pokemonNames) {
     return Autocomplete<String>(
+      fieldViewBuilder: (context, _textController, focusNode, onEditingComplete) {
+        return TextField(
+          controller: _textController,
+          focusNode: focusNode,
+          onEditingComplete: () {
+            if(pokemonNames.contains(_textController.text)){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetailsScreen(name: _textController.text)),
+              );
+            }
+            else {
+              FocusManager.instance.primaryFocus?.unfocus();
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text(Strings.foundNothing),
+              ));
+            }
+            },
+          decoration: InputDecoration(
+              hintText: Strings.searchForPokemon,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8)
+              ),
+              prefixIcon: const Icon(Icons.search)),
+        );
+      },
       optionsBuilder: (TextEditingValue textEditingValue) =>
           _autoCompleteAction(textEditingValue, pokemonNames),
       onSelected: (String selection) {
+        _textController.clear();
+        FocusManager.instance.primaryFocus?.unfocus();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -66,12 +97,14 @@ class _SearchBarState extends State<SearchBar> {
   }
 
   Iterable<String> _autoCompleteAction(TextEditingValue textEditingValue, List<String> pokemonNames) {
-    if (textEditingValue.text == '') {
+    if (textEditingValue.text.length < 2) {
       return const Iterable<String>.empty();
+    } else {
+      pokemonNames.sort();
+      return pokemonNames.where((String option) {
+        return option.contains(textEditingValue.text.toLowerCase());
+      });
     }
-    return pokemonNames.where((String option) {
-      return option.contains(textEditingValue.text.toLowerCase());
-    });
   }
 
   @override

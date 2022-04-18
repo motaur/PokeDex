@@ -20,4 +20,8 @@ class Strings {
   static const kg = "kg";
   static const sureExit = "Are you sure you want to exit?";
   static const changesWillLost = "Any Unsaved changes will be lost";
+
+  static const searchForPokemon = "Search for a Pokemon";
+
+  static const foundNothing = "Found Nothing, try another name";
 }

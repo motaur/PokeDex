@@ -41,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: Padding(
         padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          _screenTitle(),
           const SearchBar(),
           _loadGallery(
               pokemonProvider: pokemonProvider, size: deviceScreenSize),
@@ -216,9 +215,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     return tabs;
   }
-
-  _screenTitle() => Center(
-      child: Text(Strings.pokeScreenTitle, style: Styles.screenTitleTextStyle));
 
   @override
   void dispose() {
