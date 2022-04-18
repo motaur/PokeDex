@@ -8,18 +8,16 @@ class Pokemon extends ChangeNotifier {
 
   final String id;
   final String name;
-  final sprite;
-  final type1;
-  final type2;
-  final weight;
+  final String sprite;
+  final String type1;
+  final num weight;
 
   Pokemon({
     required this.id,
     required this.name,
-    this.sprite,
-    this.type1,
-    this.type2,
-    this.weight
+    required this.sprite,
+    required this.type1,
+    required this.weight
   });
 }
 
@@ -35,12 +33,12 @@ class GalleryPokemon {
 
   GalleryPokemon.fromJson(Map<String, dynamic> json) :
         name = json['name'],
-        galleryName = json['nickName'],
+        galleryName = GalleryName.values[json['galleryName']],
         id = json['id'];
 
   Map<String, dynamic> toJson() => {
     'name': name,
     'id': id,
-    'nickName': galleryName,
+    'galleryName': galleryName.index,
   };
 }

@@ -20,7 +20,7 @@ class _DetailScreenState extends State<DetailsScreen> {
 
   final String name;
   final _formKey = GlobalKey<FormState>();
-  var _galleryNameController = TextEditingController();
+  final _galleryNameController = TextEditingController();
   GalleryName? _galleryName;
 
   _DetailScreenState(this.name);
@@ -64,7 +64,7 @@ class _DetailScreenState extends State<DetailsScreen> {
               left: 35,
               child: FadeInImage.assetNetwork(
                 image: details.sprite,
-                imageScale: 0.35,
+                placeholderScale: 0.1,
                 placeholder: 'images/loading.gif',
               ),
             ),
@@ -115,7 +115,6 @@ class _DetailScreenState extends State<DetailsScreen> {
 
               TextFormField(
                 controller: _galleryNameController,
-                decoration: const InputDecoration(labelText: 'Nickname'),
                 // The validator receives the text that the user has entered.
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -125,20 +124,29 @@ class _DetailScreenState extends State<DetailsScreen> {
                 },
               ),
 
-              ElevatedButton(
-                onPressed: () {
-                  if (_galleryName != null && _formKey.currentState!.validate()) {
-                    Provider.of<PokemonProvider>(context, listen: false)
-                        .saveToGallery(id, _galleryNameController.value.text, _galleryName!)
-                        .then((value) => Navigator.pop(context));
-                  }
-                },
-                child: const Text('Save to Gallery'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_galleryName != null && _formKey.currentState!.validate()) {
+                      Provider.of<PokemonProvider>(context, listen: false)
+                          .saveToGallery(id, _galleryNameController.value.text, _galleryName!)
+                          .then((value) => Navigator.pop(context));
+                    }
+                  },
+                  child: const Text('Save to Gallery'),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _galleryNameController.dispose();
+    super.dispose();
   }
 }

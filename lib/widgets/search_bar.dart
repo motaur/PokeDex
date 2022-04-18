@@ -13,7 +13,6 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   final _textController = TextEditingController();
-  final bool _validate = false;
   late List<String> pokemonNames;
 
   @override
@@ -52,35 +51,6 @@ class _SearchBarState extends State<SearchBar> {
         return option
             .contains(textEditingValue.text.toLowerCase());
       });
-  }
-
-  buildSearchTextField(){
-    return TextField(
-          style: const TextStyle(color: Colors.black),
-          maxLines: 1,
-          controller: _textController,
-          decoration: InputDecoration(
-            hintStyle: TextStyle(color: Colors.grey[600]),
-            errorText: _validate ? null : null,
-            border: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            icon: const Padding(
-              padding: EdgeInsets.only(left: 15),
-              child: Icon(
-                Icons.search,
-                color: Colors.black,
-              ),
-            ),
-            hintText: "What Pokémon are you looking for? ",
-          ),
-          onSubmitted: (value) {
-            if (value.isNotEmpty) {
-              // Navigator.of(context)
-              //     .pushNamed(PokeDetailScreen.routeName, arguments: value);
-            }
-          },
-        );
   }
 
   @override

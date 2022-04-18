@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -15,7 +16,6 @@ class PokemonProvider with ChangeNotifier {
   final _baseUrl = "https://pokeapi.co/api/v2/pokemon";
 
   List<String> pokemonNames = [];
-  List<Pokemon> gallery = [];
   late Pokemon details;
 
   Future<List<String>> getNames() async {
@@ -36,7 +36,7 @@ class PokemonProvider with ChangeNotifier {
     }
   }
 
-  Future<List<Pokemon>> getSavedPokemons() async {
+  Future<Map<String, List<Pokemon>>> getSavedPokemons() async {
     var ids = prefs.getKeys();
 
     List<Future<Pokemon>> requests = [];
@@ -44,13 +44,30 @@ class PokemonProvider with ChangeNotifier {
     for (var id in ids) {
       requests.add(getDetails(id));
     }
-    final results = await Future.wait(requests);
+    final results = await Future.wait(requests).catchError((onError) => throw(onError));
 
-    results.map((Pokemon p) => _mergeGallery(p));
+    List<Pokemon> merged = [];
 
-    gallery = results;
+    Map<String, List<Pokemon>> pokemonByType = HashMap();
 
-    return results;
+    for (var element in results) {
+      merged.add(
+          _mergeGallery(element));
+    }
+
+    for (var pokemon in merged) {
+      List<Pokemon> list = [];
+      pokemonByType.addEntries({ pokemon.type1 : list }.entries);
+    }
+
+    for (var pokemon in merged) {
+      pokemonByType.update(pokemon.type1, (List<Pokemon> value) {
+        value.add(pokemon);
+        return value;
+      });
+    }
+
+    return pokemonByType;
   }
 
   Pokemon _mergeGallery(Pokemon p){
@@ -65,7 +82,6 @@ class PokemonProvider with ChangeNotifier {
   }
 
   Future<Pokemon> getDetails(String name) async {
-
     try {
       final response = await http.get(Uri.parse("$_baseUrl/$name"));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
@@ -74,18 +90,18 @@ class PokemonProvider with ChangeNotifier {
           name: responseData['name'],
           sprite: responseData['sprites']['front_default'],
           type1: responseData['types'][0]['type']['name'],
-          type2: responseData.length == 2 ? responseData['types'][1]['type']['name'] : null,
           weight: responseData['weight']
       );
       return details;
     } catch (e) {
+      logger.e(e);
       rethrow;
     }
   }
 
   Future<void> saveToGallery(String id, String name, GalleryName galleryName) async {
-
-    String json = jsonEncode(GalleryPokemon(name: name, id: id, galleryName: galleryName));
+    String json = jsonEncode(
+        GalleryPokemon(name: name, id: id, galleryName: galleryName));
     prefs.setString(id, json);
   }
 }
