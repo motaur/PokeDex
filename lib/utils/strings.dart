@@ -13,5 +13,11 @@ class Strings {
 
   static const weight = "Weight";
 
+  static const yes = "Yes";
+  static const no = "No";
+
   static const type = "Type";
+  static const kg = "kg";
+  static const sureExit = "Are you sure you want to exit?";
+  static const changesWillLost = "Any Unsaved changes will be lost";
 }
