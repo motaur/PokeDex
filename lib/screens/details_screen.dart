@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:poke/models/gallery_name.dart';
+import 'package:poke/utils/colors.dart';
 import 'package:provider/provider.dart';
 
 import '../models/pokemon.dart';
 import '../providers/pokemon_provider.dart';
+import '../utils/strings.dart';
 import '../utils/styles.dart';
 
 class DetailsScreen extends StatefulWidget {
@@ -17,7 +19,6 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailsScreen> {
-
   late PokemonProvider _provider;
   final String name;
   final _formKey = GlobalKey<FormState>();
@@ -34,28 +35,33 @@ class _DetailScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Pokemon>(
-        future: _provider.getDetails(name),
-        builder: (context, AsyncSnapshot<Pokemon> snapshot) {
-          if (snapshot.hasData) {
-            return _buildDetails(snapshot.requireData);
-          } else if (snapshot.hasError) {
-            return const SafeArea(
-              child: Center(child: Text('Error')),
-            );
-          } else {
-            return const SafeArea(
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-        });
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FutureBuilder<Pokemon>(
+              future: _provider.getDetails(name),
+              builder: (context, AsyncSnapshot<Pokemon> snapshot) {
+                if (snapshot.hasData) {
+                  return _buildDetails(snapshot.requireData);
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text(Strings.failed));
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              }),
+        ),
+      ),
+    );
   }
 
   _buildDetails(Pokemon details) {
     return Scaffold(
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Center(child: Text(details.name, style: Styles.screenTitleTextStyle)),
+        Center(child: _screenTitle(details.name.toUpperCase())),
         Container(height: MediaQuery.of(context).size.width * 0.4),
         Stack(
           clipBehavior: Clip.none,
@@ -90,8 +96,7 @@ class _DetailScreenState extends State<DetailsScreen> {
   }
 
   _buildSaveForm(Pokemon details) {
-
-    if(details.galleryNameType != null){
+    if (details.galleryNameType != null) {
       _galleryNameType = details.galleryNameType;
       _galleryNameController.text = details.galleryName!;
     }
@@ -113,47 +118,50 @@ class _DetailScreenState extends State<DetailsScreen> {
                       }),
                       groupValue: _galleryNameType,
                     ),
-                    const Text('Name'),
+                    const Text(Strings.name),
                     Radio(
-                      value: GalleryNameType.nickname,
-                      groupValue: _galleryNameType,
-                      onChanged: (newValue) => setState(() {
-                        _galleryNameType = newValue as GalleryNameType;
-                      })
-                    ),
-                    const Text('Nickname'),
+                        value: GalleryNameType.nickname,
+                        groupValue: _galleryNameType,
+                        onChanged: (newValue) => setState(() {
+                              _galleryNameType = newValue as GalleryNameType;
+                            })),
+                    const Text(Strings.nickname),
                   ]),
-
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: TextFormField(
                   controller: _galleryNameController,
                   // The validator receives the text that the user has entered.
                   validator: (value) {
-                    if ((value == null || value.isEmpty) && _galleryNameType == null) {
-                      return 'The field should content at least 1 character, name type should be chosen';
+                    if ((value == null || value.isEmpty)) {
+                      return Strings.nameValidation;
                     }
                     return null;
                   },
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    if(details.galleryNameType != null){
+                    if (details.galleryNameType != null) {
                       _provider
                           .deleteFromGallery(details.id)
                           .then((value) => Navigator.pop(context));
-                    }
-                    else if ((_galleryNameType != null && _formKey.currentState!.validate()) && _galleryNameType != null) {
+                    } else if ((_galleryNameType != null &&
+                            _formKey.currentState!.validate()) &&
+                        _galleryNameType != null) {
                       _provider
-                          .saveToGallery(details.id, _galleryNameController.value.text, _galleryNameType!)
+                          .saveToGallery(
+                              details.id,
+                              _galleryNameController.value.text,
+                              _galleryNameType!)
                           .then((value) => Navigator.pop(context));
                     }
                   },
-                  child: details.galleryNameType != null ? const Text('Delete from gallery') : const Text('Save to Gallery'),
+                  child: details.galleryNameType != null
+                      ? const Text(Strings.deleteFromGallery)
+                      : const Text(Strings.saveToGallery),
                 ),
               ),
             ],
@@ -162,6 +170,10 @@ class _DetailScreenState extends State<DetailsScreen> {
       ),
     );
   }
+
+  _screenTitle(String title) =>
+      Center(child: Text(
+          title, style: Styles.screenTitleTextStyle));
 
   @override
   void dispose() {

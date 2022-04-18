@@ -78,13 +78,14 @@ class PokemonProvider with ChangeNotifier {
     try {
       final response = await http.get(Uri.parse("$_baseUrl/$name"));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
-      var details = Pokemon(
-          id: responseData['id'].toString(),
-          name: responseData['name'],
-          sprite: responseData['sprites']['front_default'],
-          type: responseData['types'][0]['type']['name'],
-          weight: responseData['weight']
-      );
+      var details = Pokemon.fromJson(responseData);
+      // Pokemon(
+      //     id: responseData['id'].toString(),
+      //     name: responseData['name'],
+      //     sprite: responseData['sprites']['front_default'],
+      //     type: responseData['types'][0]['type']['name'],
+      //     weight: responseData['weight']
+      // );
 
       if(prefs.containsKey(details.id)){
         return _mergeGallery(details);

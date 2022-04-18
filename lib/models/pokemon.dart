@@ -19,6 +19,13 @@ class Pokemon extends ChangeNotifier {
     required this.type,
     required this.weight
   });
+
+  Pokemon.fromJson(Map<String, dynamic> json):
+        id = json['id'].toString(),
+        name = json['name'],
+        sprite = json['sprites']['front_default'],
+        type = json['types'][0]['type']['name'],
+        weight = json['weight'];
 }
 
 class GalleryPokemon {
@@ -29,7 +36,8 @@ class GalleryPokemon {
   GalleryPokemon({
     required this.id,
     required this.name,
-    required this.galleryName});
+    required this.galleryName
+  });
 
   GalleryPokemon.fromJson(Map<String, dynamic> json) :
         name = json['name'],

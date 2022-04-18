@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         .size;
     return SafeArea(
         child: Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.background,
           body: Padding(
             padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
             child: Column(
