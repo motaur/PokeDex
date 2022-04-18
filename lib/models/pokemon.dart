@@ -3,8 +3,8 @@ import 'package:poke/models/gallery_name.dart';
 
 class Pokemon extends ChangeNotifier {
 
-  GalleryName? galleryName;
-  String? givenName;
+  GalleryNameType? galleryNameType;
+  String? galleryName;
 
   final String id;
   final String name;
@@ -24,7 +24,7 @@ class Pokemon extends ChangeNotifier {
 class GalleryPokemon {
   final String id;
   final String name;
-  final GalleryName galleryName;
+  final GalleryNameType galleryName;
 
   GalleryPokemon({
     required this.id,
@@ -33,7 +33,7 @@ class GalleryPokemon {
 
   GalleryPokemon.fromJson(Map<String, dynamic> json) :
         name = json['name'],
-        galleryName = GalleryName.values[json['galleryName']],
+        galleryName = GalleryNameType.values[json['galleryName']],
         id = json['id'];
 
   Map<String, dynamic> toJson() => {

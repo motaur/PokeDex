@@ -9,6 +9,7 @@ import '../utils/colors.dart';
 import '../utils/strings.dart';
 import '../utils/styles.dart';
 import '../widgets/search_bar.dart';
+import 'details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,32 +28,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     provider = Provider.of<PokemonProvider>(context, listen: false);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return _buildHomeScreen();
   }
 
   Widget _buildHomeScreen() {
-      var deviceScreenSize = MediaQuery.of(context).size;
-      return SafeArea(
-          child: Scaffold(
-            backgroundColor: AppColors.white,
-            body: Padding(
-              padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children:[
-                    _screenTitle(),
-                    _searchBar(deviceScreenSize),
-                    _loadGallery(deviceScreenSize),
-                  ]),
-            ),
-          )
-      );
-    }
-
-  Widget _searchBar(Size deviceScreenSize) => const SearchBar();
+    var deviceScreenSize = MediaQuery
+        .of(context)
+        .size;
+    return SafeArea(
+        child: Scaffold(
+          backgroundColor: AppColors.white,
+          body: Padding(
+            padding: EdgeInsets.all(deviceScreenSize.width * 0.05),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _screenTitle(),
+                  const SearchBar(),
+                  _loadGallery(deviceScreenSize),
+                ]),
+          ),
+        )
+    );
+  }
 
   Widget _loadGallery(Size size) {
     return FutureBuilder<Map<String, List<Pokemon>>>(
@@ -63,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           }
           else if (snapshot.hasData && snapshot.data!.isEmpty) {
             return const SafeArea(
-                child:Center(child: Text("Nothing saved")));
+                child: Center(child: Text("Nothing saved in Gallery")));
           }
           else if (snapshot.hasError) {
             return const SafeArea(
@@ -79,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildTabs(Map<String, List<Pokemon>> data) {
-    _tabController = TabController(length: data.length+1, vsync: this);
+    _tabController = TabController(length: data.length + 1, vsync: this);
 
     return Padding(
       padding: const EdgeInsets.only(top: 32.0),
@@ -90,33 +91,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: _buildTabBar(data),
           ),
           SizedBox(
-              height: MediaQuery.of(context).size.height * 0.65,
-              child: TabBarView(
-                controller: _tabController,
-                children: _buildGrids(data),
-              ),
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.65,
+            child: TabBarView(
+              controller: _tabController,
+              children: _buildGrids(data),
             ),
+          ),
         ],
       ),
     );
   }
 
-  List<Widget> _buildGrids(Map<String, List<Pokemon>> data){
+  List<Widget> _buildGrids(Map<String, List<Pokemon>> data) {
     var allPokemons = _mergeLists(data);
     List<Widget> grids = [];
 
     //1st tab all pokemons
     grids.add(
       GridView.count(
-        crossAxisCount: 2,
-        children: List.generate(allPokemons.length, (index) => _buildCard(index, allPokemons))),
+          crossAxisCount: 2,
+          children: List.generate(
+              allPokemons.length, (index) => _buildCard(index, allPokemons))),
     );
     //rest of tabs by type
     data.forEach((key, value) {
       grids.add(
           GridView.count(
               crossAxisCount: 2,
-              children: List.generate(value.length, (index) => _buildCard(index, value)))
+              children: List.generate(
+                  value.length, (index) => _buildCard(index, value)))
       );
     });
 
@@ -124,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   List<Pokemon> _mergeLists(Map<String, List<Pokemon>> data) {
-
     List<Pokemon> allPokemons = [];
 
     data.forEach((key, value) {
@@ -136,32 +141,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return allPokemons;
   }
 
-  Widget _buildCard(int i, List<Pokemon> data){
+  Widget _buildCard(int i, List<Pokemon> data) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Card(
-          elevation: 5,
-          child: Column(
-            children: [
-
-              Text(data[i].name),
-
-              FadeInImage.assetNetwork(
-                fit: BoxFit.fitHeight,
-                image: data[i].sprite,
-                imageScale: 0.2,
-                placeholderScale: 0.1,
-                placeholder: 'images/loading.gif',
-              ),
-
-              data[i].galleryName == GalleryName.name ?
-                Text("Name: ${data[i].givenName!}") : Text("Nickname: ${data[i].givenName!}"),
-
-              Text(data[i].type)
-
-
-            ],
-          )
+      child: GestureDetector(
+        onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+              builder: (context) => DetailsScreen(name: data[i].id)),
+            );
+        },
+        child: Card(
+            elevation: 5,
+            child: Column(
+              children: [
+                Text(data[i].name),
+                FadeInImage.assetNetwork(
+                  fit: BoxFit.fitHeight,
+                  image: data[i].sprite,
+                  imageScale: 0.2,
+                  placeholderScale: 0.1,
+                  placeholder: 'images/loading.gif',
+                ),
+                data[i].galleryNameType == GalleryNameType.name ?
+                Text("Name: ${data[i].galleryName!}") : Text(
+                    "Nickname: ${data[i].galleryName!}"),
+                Text(data[i].type)
+              ],
+            )
+        ),
       ),
     );
   }
@@ -176,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  List<Widget> _buildTabsByType(Map<String, List<Pokemon>> data){
+  List<Widget> _buildTabsByType(Map<String, List<Pokemon>> data) {
     List<Widget> tabs = [];
 
     tabs.add(const Tab(text: "All"));
@@ -187,11 +196,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return tabs;
   }
 
-  _screenTitle() => Center(child: Text(Strings.pokeScreenTitle, style: Styles.screenTitleTextStyle));
+  _screenTitle() =>
+      Center(child: Text(
+          Strings.pokeScreenTitle, style: Styles.screenTitleTextStyle));
 
   @override
   void dispose() {
-   _tabController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 }

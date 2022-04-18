@@ -1,4 +1,4 @@
-enum GalleryName {
+enum GalleryNameType {
   name,
   nickname
 }

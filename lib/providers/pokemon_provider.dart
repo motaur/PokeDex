@@ -68,8 +68,8 @@ class PokemonProvider with ChangeNotifier {
         json.decode(
             prefs.getString(p.id)!) as Map<String, dynamic>);
 
-    p.galleryName = gallery.galleryName;
-    p.givenName = gallery.name;
+    p.galleryNameType = gallery.galleryName;
+    p.galleryName = gallery.name;
 
     return p;
   }
@@ -85,16 +85,25 @@ class PokemonProvider with ChangeNotifier {
           type: responseData['types'][0]['type']['name'],
           weight: responseData['weight']
       );
+
+      if(prefs.containsKey(details.id)){
+        return _mergeGallery(details);
+      }
       return details;
+
     } catch (e) {
       logger.e(e);
       rethrow;
     }
   }
 
-  Future<void> saveToGallery(String id, String name, GalleryName galleryName) async {
+  Future<void> saveToGallery(String id, String name, GalleryNameType galleryName) async {
     String json = jsonEncode(
         GalleryPokemon(name: name, id: id, galleryName: galleryName));
-    prefs.setString(id, json);
+    await prefs.setString(id, json);
+  }
+
+  Future<void> deleteFromGallery(String id) async {
+    await prefs.remove(id);
   }
 }

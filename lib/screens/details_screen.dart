@@ -18,19 +18,24 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailsScreen> {
 
+  late PokemonProvider _provider;
   final String name;
   final _formKey = GlobalKey<FormState>();
   final _galleryNameController = TextEditingController();
-  GalleryName? _galleryName;
+  GalleryNameType? _galleryNameType;
 
   _DetailScreenState(this.name);
 
   @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<PokemonProvider>(context);
+  void initState() {
+    super.initState();
+    _provider = Provider.of<PokemonProvider>(context, listen: false);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder<Pokemon>(
-        future: provider.getDetails(name),
+        future: _provider.getDetails(name),
         builder: (context, AsyncSnapshot<Pokemon> snapshot) {
           if (snapshot.hasData) {
             return _buildDetails(snapshot.requireData);
@@ -79,12 +84,18 @@ class _DetailScreenState extends State<DetailsScreen> {
               ),
               child: Column()),
         ),
-        _buildSaveForm(details.id)
+        _buildSaveForm(details)
       ],
     ));
   }
 
-  _buildSaveForm(String id) {
+  _buildSaveForm(Pokemon details) {
+
+    if(details.galleryNameType != null){
+      _galleryNameType = details.galleryNameType;
+      _galleryNameController.text = details.galleryName!;
+    }
+
     return Form(
       key: _formKey,
       child: SafeArea(
@@ -96,45 +107,53 @@ class _DetailScreenState extends State<DetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Radio(
-                      value: GalleryName.name,
+                      value: GalleryNameType.name,
                       onChanged: (newValue) => setState(() {
-                        _galleryName = newValue as GalleryName;
+                        _galleryNameType = newValue as GalleryNameType;
                       }),
-                      groupValue: _galleryName,
+                      groupValue: _galleryNameType,
                     ),
                     const Text('Name'),
                     Radio(
-                      value: GalleryName.nickname,
-                      groupValue: _galleryName,
+                      value: GalleryNameType.nickname,
+                      groupValue: _galleryNameType,
                       onChanged: (newValue) => setState(() {
-                        _galleryName = newValue as GalleryName;
+                        _galleryNameType = newValue as GalleryNameType;
                       })
                     ),
-                    const Text('Nick'),
+                    const Text('Nickname'),
                   ]),
 
-              TextFormField(
-                controller: _galleryNameController,
-                // The validator receives the text that the user has entered.
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'The field should content at least 1 character';
-                  }
-                  return null;
-                },
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextFormField(
+                  controller: _galleryNameController,
+                  // The validator receives the text that the user has entered.
+                  validator: (value) {
+                    if ((value == null || value.isEmpty) && _galleryNameType == null) {
+                      return 'The field should content at least 1 character, name type should be chosen';
+                    }
+                    return null;
+                  },
+                ),
               ),
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_galleryName != null && _formKey.currentState!.validate()) {
-                      Provider.of<PokemonProvider>(context, listen: false)
-                          .saveToGallery(id, _galleryNameController.value.text, _galleryName!)
+                    if(details.galleryNameType != null){
+                      _provider
+                          .deleteFromGallery(details.id)
+                          .then((value) => Navigator.pop(context));
+                    }
+                    else if ((_galleryNameType != null && _formKey.currentState!.validate()) && _galleryNameType != null) {
+                      _provider
+                          .saveToGallery(details.id, _galleryNameController.value.text, _galleryNameType!)
                           .then((value) => Navigator.pop(context));
                     }
                   },
-                  child: const Text('Save to Gallery'),
+                  child: details.galleryNameType != null ? const Text('Delete from gallery') : const Text('Save to Gallery'),
                 ),
               ),
             ],
