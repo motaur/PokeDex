@@ -1,105 +1,35 @@
-import 'dart:collection';
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
-import 'package:poke/models/gallery_name.dart';
 
-import '../main.dart';
+import 'package:poke/models/gallery_name.dart';
 import '../models/pokemon.dart';
+import '../services/pokemon_service.dart';
 
 class PokemonProvider with ChangeNotifier {
 
-  final _baseUrl = "https://pokeapi.co/api/v2/pokemon";
+  final PokemonService _pokemonService;
+
+  PokemonProvider(this._pokemonService);
 
   Future<List<String>> getNames() async {
-    try {
-      Uri url = Uri.parse("$_baseUrl/?offset=0&limit=999999");
-      final response = await http.get(url);
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
-      List<String> pokemonNames = [];
-      for (var element in (responseData['results'] as List)) {
-        element as Map<String, dynamic>;
-        var name = element['name'] as String;
-        pokemonNames.add(name);
-      }
-      notifyListeners();
-      return pokemonNames;
-    } catch (e) {
-      logger.e(e);
-      rethrow;
-    }
+    var names = _pokemonService.getNames();
+    return names;
   }
 
   Future<Map<String, List<Pokemon>>> getSavedPokemons() async {
-    Map<String, List<Pokemon>> pokemonByType = HashMap();
-
-    var ids = prefs.getKeys();
-    List<Future<Pokemon>> requests = [];
-
-    for (var id in ids) {
-      requests.add(getDetails(id));
-    }
-    final results = await Future.wait(requests).catchError((onError) => throw(onError));
-
-    List<Pokemon> merged = [];
-
-    for (var element in results) {
-      merged.add(
-          _mergeGallery(element));
-    }
-
-    for (var pokemon in merged) {
-      List<Pokemon> list = [];
-      pokemonByType.addEntries({ pokemon.type : list }.entries);
-    }
-
-    for (var pokemon in merged) {
-      pokemonByType.update(pokemon.type, (List<Pokemon> value) {
-        value.add(pokemon);
-        return value;
-      });
-    }
-    return pokemonByType;
-  }
-
-  Pokemon _mergeGallery(Pokemon p){
-    var gallery = GalleryPokemon.fromJson(
-        json.decode(
-            prefs.getString(p.id)!) as Map<String, dynamic>);
-
-    p.galleryNameType = gallery.galleryName;
-    p.galleryName = gallery.name;
-
-    return p;
+    return _pokemonService.getSavedPokemons();
   }
 
   Future<Pokemon> getDetails(String name) async {
-    try {
-      final response = await http.get(Uri.parse("$_baseUrl/$name"));
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
-      var details = Pokemon.fromJson(responseData);
-
-      if(prefs.containsKey(details.id)){
-        return _mergeGallery(details);
-      }
-      return details;
-
-    } catch (e) {
-      logger.e(e);
-      rethrow;
-    }
+    return _pokemonService.getDetails(name);
   }
 
   Future<void> saveToGallery(String id, String name, GalleryNameType galleryName) async {
-    String json = jsonEncode(
-        GalleryPokemon(name: name, id: id, galleryName: galleryName));
-    await prefs.setString(id, json);
+    await _pokemonService.saveToGallery(id, name, galleryName);
     notifyListeners();
   }
 
   Future<void> deleteFromGallery(String id) async {
-    await prefs.remove(id);
+    await _pokemonService.removeFromGallery(id);
     notifyListeners();
   }
 }

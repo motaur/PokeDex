@@ -3,10 +3,10 @@ import 'package:poke/models/gallery_name.dart';
 import 'package:poke/providers/pokemon_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../models/pokemon.dart';
-import '../utils/strings.dart';
-import '../utils/styles.dart';
-import '../utils/utils.dart';
+import '../../models/pokemon.dart';
+import '../../utils/strings.dart';
+import '../../utils/styles.dart';
+import '../../utils/utils.dart';
 import '../widgets/search_bar.dart';
 import 'details_screen.dart';
 

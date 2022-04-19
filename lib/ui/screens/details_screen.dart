@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:poke/models/gallery_name.dart';
 import 'package:provider/provider.dart';
 
-import '../models/pokemon.dart';
-import '../providers/pokemon_provider.dart';
-import '../utils/strings.dart';
-import '../utils/styles.dart';
-import '../utils/utils.dart';
+import '../../models/pokemon.dart';
+import '../../providers/pokemon_provider.dart';
+import '../../utils/strings.dart';
+import '../../utils/styles.dart';
+import '../../utils/utils.dart';
 
 class DetailsScreen extends StatefulWidget {
   final String name;

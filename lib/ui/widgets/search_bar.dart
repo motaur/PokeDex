@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/pokemon_provider.dart';
+import '../../providers/pokemon_provider.dart';
+import '../../utils/strings.dart';
 import '../screens/details_screen.dart';
-import '../utils/strings.dart';
 
 class SearchBar extends StatefulWidget {
   const SearchBar({Key? key}) : super(key: key);
@@ -15,18 +14,18 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   final _textController = TextEditingController();
-  late PokemonProvider provider;
+  late PokemonProvider _provider;
 
   @override
   void initState() {
     super.initState();
-    provider = Provider.of<PokemonProvider>(context, listen: false);
+    _provider = Provider.of<PokemonProvider>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<String>>(
-        future: provider.getNames(),
+        future: _provider.getNames(),
         builder: (context, AsyncSnapshot<List<String>> snapshot) {
           if (snapshot.hasData) {
             return _buildSearch(snapshot.data!);
