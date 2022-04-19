@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: _buildTabBar(data),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.65,
+            height: MediaQuery.of(context).size.height * 0.6,
             child: TabBarView(
               controller: _tabController,
               children: _buildGrids(data),
@@ -159,10 +159,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
-          // color: Colors.white,
           border: Border.all(
             width: 1,
-            // color: AppColors.gray200
           ),
           borderRadius: const BorderRadius.all(Radius.circular(8))),
       child: Padding(

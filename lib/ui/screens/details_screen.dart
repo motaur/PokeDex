@@ -76,9 +76,8 @@ class _DetailScreenState extends State<DetailsScreen> {
         Expanded(
           child: Container(
               width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.only(top: 1),
               decoration: const BoxDecoration(
-                  // color: Colors.white,
                   ),
               child: Column(
                 children: [
@@ -103,7 +102,7 @@ class _DetailScreenState extends State<DetailsScreen> {
       key: _formKey,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(2.0),
+          padding: const EdgeInsets.all(1.0),
           child: Column(
             children: <Widget>[
               Row(
@@ -138,7 +137,7 @@ class _DetailScreenState extends State<DetailsScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(2.0),
+          padding: const EdgeInsets.all(1.0),
           child: TextFormField(
             controller: _galleryNameController,
             // The validator receives the text that the user has entered.
@@ -151,7 +150,7 @@ class _DetailScreenState extends State<DetailsScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(2.0),
+          padding: const EdgeInsets.all(1.0),
           child: ElevatedButton(
             onPressed: () {
               if (details.galleryNameType != null) {
