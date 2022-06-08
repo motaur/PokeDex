@@ -1,6 +1,7 @@
-# poke
+# PokeDex
 
-A new Flutter project.
+Basic Flutter app that uses https://pokeapi.co/ to provide ability to search pokemons and add them to local gallery.
+The app uses Provider state management and shared preferences, getIt Di. It supports ligfht and dark theme.
 
 ## Getting Started
 
